@@ -7,18 +7,19 @@
 #include <set>
 #include <string>
 #include "Puntaje.h" 
-
+#include "Rate.h"
 using namespace std;
 
 class Query {
 private:
     vector<Puntaje> datos; 
     set<int> canciones;    
-    set<int> usuarios;     
+    set<int> usuarios;    
+	unordered_map<int, vector<Rate>> user_ratings;
 
 public:
-    Query(const vector<Puntaje>& puntuaciones);
-
+    Query(const vector<Puntaje>& puntuaciones, const set<int>& canciones, 
+      const set<int>& usuarios, const unordered_map<int, vector<Rate>>& user_ratings);
     void mostrarMenu(); 
 
     void cantidadCanciones() const;
@@ -35,5 +36,5 @@ public:
     void promedioGlobal();                                 
 };
 
-#endif 
+#endif // QUERY_H
 

@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include "Puntaje.h"
-
+#include "Query.h"
+#include "Rate.h"
 using namespace std;
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
@@ -18,7 +19,8 @@ int main(){
 	set<int> songs;
 	set<int> users;
 	vector<Puntaje> arr;
-		
+	unordered_map<int, vector<Rate>> user_ratings;	
+	
 	while(getline(data, linea)){
 		stringstream ss(linea);
 		string campo;
@@ -34,10 +36,17 @@ int main(){
         p.puntaje = stod(fila[2]);
 		songs.insert(p.id_cancion);
 		users.insert(p.id_usuario);
+		
+		Rate r;
+		r.song_id = p.id_cancion;
+		r.score = p.puntaje;
+
+		user_ratings[p.id_usuario].push_back(r);
+		
 		arr.push_back(p);
 	}
 	data.close();
-
+	Query query(arr, songs, users, user_ratings);
 
     int opcion;
     do {
@@ -63,29 +72,36 @@ int main(){
 
         cout << BOLD << BLUE << "\nIngrese una opción: " << RESET;
         cin >> opcion;
-
+		int id;
         switch (opcion) {
             case 1:
-                cout << "Consulta 1 seleccionada\n";
-
+				cout << "Ingrese ID de usuario: ";
+                cin >> id;
+                query.topCancionesPorUsuario(id);
                 break;
             case 2:
-                cout << "Consulta 2 seleccionada\n";
-                break;
+                cout << "Ingrese ID de canción: ";
+                cin >> id;
+                query.topUsuariosPorCancion(id);
+				break;
             case 3:
-                cout << "Consulta 3 seleccionada\n";
-                break;
+               	query.topCancionesMasVotadas();
+                break; 
             case 4:
-                cout << "Consulta 4 seleccionada\n";
-                break;
+                cout << "Ingrese ID de usuario: ";
+                cin >> id;
+                query.usuariosSimilares(id);
+				break;
             case 5:
-                cout << "Consulta 5 seleccionada\n";
+          	    cout << "Ingrese ID de usuario: ";
+                cin >> id;
+                query.recomendacionesParaUsuario(id);
                 break;
-            case 6:
-                cout << "Consulta 6 seleccionada\n";
+			case 6:
+                query.usuarioMasActivo();
                 break;
             case 7:
-                cout << "Consulta 7 seleccionada\n";
+                query.promedioGlobal();
                 break;
             case 8:
                 cout << GREEN << "Saliendo del sistema. ¡Hasta pronto!\n" << RESET;
