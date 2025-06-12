@@ -1,4 +1,6 @@
 #include <bits/stdc++.h>
+#include "Puntaje.h"
+
 using namespace std;
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
@@ -10,20 +12,6 @@ using namespace std;
 #define WHITE   "\033[37m"
 #define BOLD    "\033[1m"
 
-struct Puntaje{
-	int id_usuario;
-	int id_cancion;
-	double puntaje;
-	Puntaje() = default;
-	Puntaje(int usuario, int cancion, double valor)
-        : id_usuario(usuario), id_cancion(cancion), puntaje(valor) {}
-	void mostrar() const {
-		cout<<"Usuario: "<<id_usuario<<endl;
-		cout<<"Canción: "<<id_cancion<<endl;
-		cout<<"Puntaje: "<<puntaje<<endl;
-	}
-
-};
 int main(){
 	ifstream data("ratings.csv");
 	string linea;
@@ -68,7 +56,7 @@ int main(){
         cout << "2. En función a una canción (Top 10 usuarios que votaron mejor la canción X)\n";
         cout << "3. Obtener las 10 canciones más votadas\n";
         cout << "4. Agrupar por gustos (Top 20 usuarios con gustos similares a X)\n";
-        cout << "5. Mostrar las 10 recomendaciones de canciones.\n";
+        cout << "5. Mostrar las 10 recomendaciones de canciones para el usuario X.\n";
         cout << "6. Mostrar el usuario más activo (más puntuaciones hechas)\n";
         cout << "7. Mostrar el promedio de puntaje global\n";
         cout << "8. SALIR\n" << RESET;
@@ -79,6 +67,7 @@ int main(){
         switch (opcion) {
             case 1:
                 cout << "Consulta 1 seleccionada\n";
+
                 break;
             case 2:
                 cout << "Consulta 2 seleccionada\n";
