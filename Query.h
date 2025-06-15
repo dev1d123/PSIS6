@@ -16,10 +16,10 @@ private:
     set<int> canciones;    
     set<int> usuarios;    
 	unordered_map<int, vector<Rate>> user_ratings;
-
+	int quantity;
 public:
     Query(const vector<Puntaje>& puntuaciones, const set<int>& canciones, 
-      const set<int>& usuarios, const unordered_map<int, vector<Rate>>& user_ratings);
+      const set<int>& usuarios, const unordered_map<int, vector<Rate>>& user_ratings, int K);
     void mostrarMenu(); 
 
     void cantidadCanciones() const;

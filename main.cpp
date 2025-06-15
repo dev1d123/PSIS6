@@ -13,6 +13,8 @@ using namespace std;
 #define WHITE   "\033[37m"
 #define BOLD    "\033[1m"
 
+const int K = 20;
+
 int main(){
 	ifstream data("ratings.csv");
 	string linea;
@@ -46,7 +48,8 @@ int main(){
 		arr.push_back(p);
 	}
 	data.close();
-	Query query(arr, songs, users, user_ratings);
+	
+	Query query(arr, songs, users, user_ratings, K);
 
     int opcion;
     do {
@@ -61,11 +64,11 @@ int main(){
 
         cout << BOLD << "\n======================================" << RESET << endl;
         cout << BOLD << GREEN << "Seleccione la consulta\n" << RESET;
-        cout << MAGENTA << "1. En función a una persona (Top 10 canciones favoritas del usuario X)\n";
-        cout << "2. En función a una canción (Top 10 usuarios que votaron mejor la canción X)\n";
-        cout << "3. Obtener las 10 canciones más votadas\n";
-        cout << "4. Agrupar por gustos (Top 20 usuarios con gustos similares a X)\n";
-        cout << "5. Mostrar las 10 recomendaciones de canciones para el usuario X.\n";
+        cout << MAGENTA << "1. En función a una persona (Top "<<K<<" canciones favoritas del usuario X)\n";
+        cout << "2. En función a una canción (Top "<<K<<" usuarios que votaron mejor la canción X)\n";
+        cout << "3. Obtener las "<<K<<" canciones más votadas\n";
+        cout << "4. Agrupar por gustos (Top "<<K<<" usuarios con gustos similares a X)\n";
+        cout << "5. Mostrar las "<<K<<" recomendaciones de canciones para el usuario X.\n";
         cout << "6. Mostrar el usuario más activo (más puntuaciones hechas)\n";
         cout << "7. Mostrar el promedio de puntaje global\n";
         cout << "8. SALIR\n" << RESET;
