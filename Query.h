@@ -22,18 +22,19 @@ public:
       const set<int>& usuarios, const unordered_map<int, vector<Rate>>& user_ratings, int K);
     void mostrarMenu(); 
 
-    void cantidadCanciones() const;
-    void cantidadUsuarios() const;
-    void cantidadTotalPuntuaciones() const;
+    vector<string> cantidadCanciones() const;
+    vector<string> cantidadUsuarios() const;
+    vector<string> cantidadTotalPuntuaciones() const;
 
    
-    void topCancionesPorUsuario(int id_usuario);           
-    void topUsuariosPorCancion(int id_cancion);            
-    void topCancionesMasVotadas();                        
-    void usuariosSimilares(int id_usuario);                
-    void recomendacionesParaUsuario(int id_usuario);      
-    void usuarioMasActivo();                               
-    void promedioGlobal();                                 
+    vector<string> topCancionesPorUsuario(int id_usuario);           
+    vector<string> topUsuariosPorCancion(int id_cancion);            
+    vector<string> topCancionesMasVotadas();                        
+    vector<string> usuariosSimilares(int id_usuario);                
+    vector<string> recomendacionesParaUsuario(int id_usuario);      
+    vector<string> usuarioMasActivo();                               
+    vector<string> promedioGlobal();                                 
+
 };
 
 #endif // QUERY_H

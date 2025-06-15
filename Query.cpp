@@ -5,6 +5,8 @@
 
 int K;
 
+vector<string> ret;
+
 struct RateCompare {
 	bool operator()(const Rate& a, const Rate& b) const {
     	return a.score < b.score; 
@@ -25,35 +27,44 @@ Query::Query(const vector<Puntaje>& puntuaciones, const set<int>& songs,
 		K = q;
 	}
 
-void Query::cantidadCanciones() const {
-    cout << "Cantidad de canciones: " << canciones.size() << endl;
 
-
+vector<string> Query::cantidadCanciones() const {
+	ret.clear();
+	ret.push_back("Cantidad de canciones: " + canciones.size());
+	return ret;
 }
 
-void Query::cantidadUsuarios() const {
-    cout << "Cantidad de usuarios: " << usuarios.size() << endl;
+vector<string> Query::cantidadUsuarios() const {
+    ret.clear();
+	ret.push_back("Cantidad de usuarios: " + usuarios.size());
+	return ret;
 }
 
-void Query::cantidadTotalPuntuaciones() const {
-    cout << "Cantidad total de puntuaciones: " << datos.size() << endl;
+vector<string> Query::cantidadTotalPuntuaciones() const {
+    ret.clear();
+	ret.push_back("Cantidad total de puntuaciones: " + datos.size());
+	return ret;
 }
 	
-void Query::topCancionesPorUsuario(int id_usuario) {
+
+vector<string> Query::topCancionesPorUsuario(int id_usuario) {
+	ret.clear();
 	priority_queue<Rate, vector<Rate>, RateCompare> pq;
 	for (const Rate& rate : user_ratings[id_usuario]) {
         pq.push(rate);
     }
-	cout << "Canciones mejor puntuadas del usuario " << id_usuario << ":\n";
+	ret.push_back("Canciones mejor puntuadas del usuario " + to_string(id_usuario));
 	int sz = K;
 	while(!pq.empty() && sz){
 		Rate r = pq.top(); pq.pop();
-		cout<<"Canción: "<<r.song_id<< " -> Puntaje: " <<r.score<<endl;	
+		ret.push_back("Canción: " + to_string(r.song_id) + " -> Puntaje: " + to_string(r.score));	
 		sz--;
 	}
+	return ret;
 }
 
-void Query::topUsuariosPorCancion(int id_cancion) {
+vector<string> Query::topUsuariosPorCancion(int id_cancion) {
+	ret.clear();
 	priority_queue<Puntaje, vector<Puntaje>, PuntajeCompare> pq;
 	for (Puntaje pun : datos) {
     	if (pun.id_cancion == id_cancion) {
@@ -62,17 +73,24 @@ void Query::topUsuariosPorCancion(int id_cancion) {
     }
 
     if (pq.empty()) {
-        cout << "No hay puntuaciones registradas para la canción con ID " << id_cancion << ".\n";
-        return;
+        ret.push_back("No hay puntuaciones registradas para la canción con ID " + to_string(id_cancion));
+        return ret;
     }
+
+	ret.push_back("Usuarios con mejores puntuaciones para la canción " + to_string(id_cancion));
+
 	int sz = 20;
 	while(!pq.empty() && sz){
 		Puntaje p = pq.top(); pq.pop();
-		cout << "Usuario: " << p.id_usuario << " -> Puntaje: " << p.puntaje << endl;
+		ret.push_back("Usuario: " + to_string(p.id_usuario) + " -> Puntaje: " + to_string(p.puntaje));
+		sz--;
 	}
+	return ret;
 }
 
-void Query::topCancionesMasVotadas() {
+vector<string> Query::topCancionesMasVotadas() {
+	ret.clear();
+
     map<int, int> song_votes;                  
     map<int, map<double, int>> song_kind;      
     for (const Puntaje& pun : datos) {
@@ -88,34 +106,36 @@ void Query::topCancionesMasVotadas() {
 
     int k = min(K, (int)vote_vector.size());
 
-    cout << setw(12) << "Cancion ID" << setw(10) << "Votos"
-         << setw(6) << "0.5" << setw(6) << "1" << setw(6) << "1.5"
-         << setw(6) << "2" << setw(6) << "2.5" << setw(6) << "3"
-         << setw(6) << "3.5" << setw(6) << "4" << setw(6) << "4.5"
-         << setw(6) << "5" << endl;
+	string header = "ID Votos 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5";
+	ret.push_back(header);
+
     for (int i = 0; i < k; ++i) {
         int song_id = vote_vector[i].first;
-        cout << setw(12) << song_id
-             << setw(10) << song_votes[song_id];
+        stringstream ss;
+        ss << song_id
+           << " " << song_votes[song_id];
 
         for (double score = 0.5; score <= 5.0; score += 0.5) {
             int count = song_kind[song_id][score];
-            cout << setw(6) << count;
+            ss << " " << count;
         }
-        cout << endl;
+        ret.push_back(ss.str());
     }
+
+	return ret;
 }
 
-void Query::usuariosSimilares(int id_usuario) {
+vector<string> Query::usuariosSimilares(int id_usuario) {
+	ret.clear();
+
 	if(usuarios.find(id_usuario) == usuarios.end()){
-		cerr<<"Usuario no encontrado"<<endl;
-		return;
+		ret.push_back("Usuario no encontrado");
+		return ret;
 	}
 	const int k = K;
 	vector<pair<int, double>> similar_users;
 	
 	unordered_map<int, double> target_ratings;	
-	
 	for (const auto& r : user_ratings[id_usuario]) {
     	target_ratings[r.song_id] = r.score;
     }
@@ -127,6 +147,7 @@ void Query::usuariosSimilares(int id_usuario) {
 		for (const auto& r : user_ratings[user]) {
         	current_ratings[r.song_id] = r.score;
         }
+
 		double dot_product = 0.0, mag_target = 0.0, mag_current = 0.0;
 		
 		for(auto& pair: target_ratings){
@@ -146,6 +167,7 @@ void Query::usuariosSimilares(int id_usuario) {
 		double similarity = (mag_target == 0 || mag_current == 0) ? 0.0 : dot_product / (mag_target * mag_current);
 		similar_users.emplace_back(user, similarity);
 	}
+
 	sort(similar_users.begin(), similar_users.end(),
 		[](const pair<int, double>& a, const pair<int, double>& b){
 			return a.second > b.second;
@@ -154,18 +176,23 @@ void Query::usuariosSimilares(int id_usuario) {
 	if (similar_users.size() > k) {
         similar_users.resize(k);
    	}
-	cout << "Usuarios más similares al usuario: " << id_usuario << endl;
-    for (const auto& [user, sim] : similar_users) {
-        cout << "Usuario " << user << ": similitud = " << sim << endl;
+	
+	ret.push_back("Usuarios más similares al usuario: " + to_string(id_usuario));
+	for (const auto& [user, sim] : similar_users) {
+        stringstream ss;
+        ss << "Usuario " << user << ": similitud = " << fixed << setprecision(3) << sim;
+        ret.push_back(ss.str());
     }
 
+	return ret;
 }
 
-void Query::recomendacionesParaUsuario(int id_usuario) {
+vector<string> Query::recomendacionesParaUsuario(int id_usuario) {
+	ret.clear();
 
 	if (usuarios.find(id_usuario) == usuarios.end()) {
-        cerr << "Usuario no encontrado\n";
-        return;
+        ret.push_back("Usuario no encontrado");
+        return ret;
     }
 
     unordered_set<int> canciones_usuario;
@@ -173,7 +200,6 @@ void Query::recomendacionesParaUsuario(int id_usuario) {
 		canciones_usuario.insert(r.song_id);
     }
 
-    // Obtener usuarios similares
     vector<pair<int, double>> similar_users;
     unordered_map<int, double> target_ratings;
     for (const auto& r : user_ratings[id_usuario]) {
@@ -229,15 +255,20 @@ void Query::recomendacionesParaUsuario(int id_usuario) {
         return a.second > b.second;
     });
 
-    cout << "Recomendaciones para el usuario " << id_usuario << ":\n";
+	ret.push_back("Recomendaciones para el usuario " + to_string(id_usuario) + ":");
     int count = 0;
     for (const auto& [song_id, score] : recomendaciones) {
-        cout << "Canción: " << song_id << " -> Puntuación ponderada: " << score << endl;
+        stringstream ss;
+        ss << "Canción: " << song_id << " -> Puntuación ponderada: " << fixed << setprecision(2) << score;
+        ret.push_back(ss.str());
         if (++count == K) break;
     }
-	
+
+	return ret;
 }
-void Query::usuarioMasActivo() {
+
+vector<string> Query::usuarioMasActivo() {
+	ret.clear();
     unordered_map<int, int> conteo;
     for (const Puntaje& pun : datos) {
         conteo[pun.id_usuario]++;
@@ -252,16 +283,19 @@ void Query::usuarioMasActivo() {
     }
 
     if (max_usuario != -1) {
-        cout << "Usuario más activo: " << max_usuario << " con " << max_puntajes << " puntuaciones.\n";
+        ret.push_back("Usuario más activo: " + to_string(max_usuario) + " con " + to_string(max_puntajes) + " puntuaciones.");
     } else {
-        cout << "No se encontraron usuarios con puntuaciones.\n";
+        ret.push_back("No se encontraron usuarios con puntuaciones.");
     }
+
+	return ret;
 }
 
-void Query::promedioGlobal() {
-    if (datos.empty()) {
-        cout << "No hay puntuaciones registradas.\n";
-        return;
+vector<string> Query::promedioGlobal() {
+	ret.clear();
+	if (datos.empty()) {
+        ret.push_back("No hay puntuaciones registradas.");
+        return ret;
     }
 
     double suma = 0.0;
@@ -270,7 +304,11 @@ void Query::promedioGlobal() {
     }
 
     double promedio = suma / datos.size();
-    cout << "Promedio global de puntuaciones: " << fixed << setprecision(2) << promedio << endl;
+	stringstream ss;
+	ss << "Promedio global de puntuaciones: " << fixed << setprecision(2) << promedio;
+	ret.push_back(ss.str());
+
+	return ret;
 }
 
 
